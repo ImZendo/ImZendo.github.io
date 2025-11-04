@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anthony Benitez - Project Details</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="projects.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="index.html">Portfolio</a>
+            </div>
+            <div class="nav-menu" id="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="index.html#about" class="nav-link">About</a>
+                <a href="index.html#skills" class="nav-link">Skills</a>
+                <a href="index.html#projects" class="nav-link">Projects</a>
+                <a href="projects.html" class="nav-link active">Project Details</a>
+                <a href="index.html#contact" class="nav-link">Contact</a>
+            </div>
+            <div class="nav-toggle" id="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <section class="projects-header">
+        <div class="container">
+            <h1 class="page-title">Project Deep Dive</h1>
+            <p class="page-subtitle">Detailed breakdown of my Lua scripting and game development projects</p>
+        </div>
+    </section>
+
+    <!-- Project Details Container -->
+    <div class="container projects-container">
+        
+        <!-- Tofu-Job System -->
+        <div class="project-detail" id="tofu-job">
+            <div class="project-header">
+                <h2><i class="fas fa-briefcase"></i> Tofu-Job System</h2>
+                <div class="project-badges">
+                    <span class="badge lua">Lua</span>
+                    <span class="badge database">Database</span>
+                    <span class="badge realtime">Real-time</span>
+                </div>
+            </div>
+            
+            <div class="project-overview">
+                <h3>Overview</h3>
+                <p>A comprehensive job management system designed for gaming servers, featuring dynamic job creation, player employment mechanics, salary systems, and workplace interactions. The system includes real-time job tracking, performance analytics, and administrative controls.</p>
+                
+                <div class="features-grid">
+                    <div class="feature">
+                        <i class="fas fa-users"></i>
+                        <span>Multi-player job assignment</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>Dynamic salary calculation</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Performance tracking</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-cog"></i>
+                        <span>Admin management panel</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-section">
+                <h3>Key Code Snippets</h3>
+                
+                <div class="code-block">
+                    <h4>Job Registration System</h4>
+                    <pre><code class="language-lua">-- Job registration and player assignment
+function RegisterJob(jobName, maxPlayers, baseSalary, requirements)
+    local jobData = {
+        name = jobName,
+        maxPlayers = maxPlayers,
+        currentPlayers = 0,
+        baseSalary = baseSalary,
+        requirements = requirements,
+        activeWorkers = {},
+        createdAt = os.time()
+    }
+    
+    Jobs[jobName] = jobData
+    TriggerClientEvent('tofu-job:jobCreated', -1, jobData)
+    
+    print(string.format('[TOFU-JOB] Job "%s" registered with %d max players', 
+          jobName, maxPlayers))
+end
+
+-- Player job assignment with validation
+function AssignPlayerToJob(playerId, jobName)
+    local player = GetPlayerPed(playerId)
+    local job = Jobs[jobName]
+    
+    if not job then
+        TriggerClientEvent('tofu-job:notify', playerId, 'Job does not exist', 'error')
+        return false
+    end
+    
+    if job.currentPlayers >= job.maxPlayers then
+        TriggerClientEvent('tofu-job:notify', playerId, 'Job is full', 'error')
+        return false
+    end
+    
+    -- Add player to job
+    job.activeWorkers[playerId] = {
+        startTime = os.time(),
+        performance = 0,
+        earnings = 0
+    }
+    
+    job.currentPlayers = job.currentPlayers + 1
+    PlayerJobs[playerId] = jobName
+    
+    TriggerClientEvent('tofu-job:jobAssigned', playerId, job)
+    return true
+end</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <h4>Salary Calculation Engine</h4>
+                    <pre><code class="language-lua">-- Dynamic salary calculation based on performance
+function CalculateSalary(playerId, workDuration)
+    local job = Jobs[PlayerJobs[playerId]]
+    local worker = job.activeWorkers[playerId]
+    
+    if not job or not worker then return 0 end
+    
+    local basePay = job.baseSalary
+    local performanceMultiplier = 1 + (worker.performance / 100)
+    local timeBonus = math.min(workDuration / 3600, 2.0) -- Max 2x for time
+    
+    local totalSalary = basePay * performanceMultiplier * timeBonus
+    
+    -- Add random bonus events
+    if math.random(1, 100) <= 10 then -- 10% chance
+        totalSalary = totalSalary * 1.5
+        TriggerClientEvent('tofu-job:notify', playerId, 'Bonus earned!', 'success')
+    end
+    
+    return math.floor(totalSalary)
+end
+
+-- Performance tracking system
+function UpdatePerformance(playerId, taskCompleted, quality)
+    local job = Jobs[PlayerJobs[playerId]]
+    if not job or not job.activeWorkers[playerId] then return end
+    
+    local performanceGain = quality * 2 -- Quality ranges 1-10
+    job.activeWorkers[playerId].performance = 
+        math.min(job.activeWorkers[playerId].performance + performanceGain, 100)
+    
+    TriggerClientEvent('tofu-job:performanceUpdate', playerId, 
+                       job.activeWorkers[playerId].performance)
+end</code></pre>
+                </div>
+            </div>
+
+            <div class="technical-details">
+                <h3>Technical Highlights</h3>
+                <ul>
+                    <li><strong>Real-time Data Sync:</strong> Efficient player state management across server instances</li>
+                    <li><strong>Performance Metrics:</strong> Dynamic calculation system with bonus mechanics</li>
+                    <li><strong>Scalable Architecture:</strong> Modular design supporting multiple job types</li>
+                    <li><strong>Database Integration:</strong> Persistent storage for player progress and earnings</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Zendo-Racing Engine -->
+        <div class="project-detail" id="zendo-racing">
+            <div class="project-header">
+                <h2><i class="fas fa-flag-checkered"></i> Zendo-Racing Engine</h2>
+                <div class="project-badges">
+                    <span class="badge lua">Lua</span>
+                    <span class="badge multiplayer">Multiplayer</span>
+                    <span class="badge realtime">Real-time</span>
+                </div>
+            </div>
+            
+            <div class="project-overview">
+                <h3>Overview</h3>
+                <p>Advanced racing system featuring custom track creation, precise lap timing, competitive leaderboards, and seamless multiplayer support. Includes checkpoint validation, comprehensive race statistics, and tournament management capabilities for competitive gaming environments.</p>
+                
+                <div class="features-grid">
+                    <div class="feature">
+                        <i class="fas fa-stopwatch"></i>
+                        <span>Precision timing system</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-trophy"></i>
+                        <span>Leaderboard rankings</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-route"></i>
+                        <span>Custom track builder</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-users"></i>
+                        <span>Tournament system</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-section">
+                <h3>Key Code Snippets</h3>
+                
+                <div class="code-block">
+                    <h4>Race Management System</h4>
+                    <pre><code class="language-lua">-- Race state management and timing
+local RaceManager = {}
+RaceManager.activeRaces = {}
+RaceManager.playerRaces = {}
+
+function RaceManager:StartRace(raceId, trackId, participants)
+    local race = {
+        id = raceId,
+        trackId = trackId,
+        participants = participants,
+        startTime = GetGameTimer(),
+        status = 'active',
+        leaderboard = {},
+        currentLap = {}
+    }
+    
+    -- Initialize participant data
+    for _, playerId in pairs(participants) do
+        race.currentLap[playerId] = 1
+        race.leaderboard[playerId] = {
+            lapTimes = {},
+            bestLap = 999999,
+            totalTime = 0,
+            position = #participants,
+            checkpoints = 0
+        }
+        
+        self.playerRaces[playerId] = raceId
+        TriggerClientEvent('zendo-racing:raceStart', playerId, race)
+    end
+    
+    self.activeRaces[raceId] = race
+    print(string.format('[RACING] Race %s started with %d participants', 
+          raceId, #participants))
+end
+
+-- Checkpoint validation and timing
+function RaceManager:ValidateCheckpoint(playerId, checkpointId)
+    local raceId = self.playerRaces[playerId]
+    local race = self.activeRaces[raceId]
+    
+    if not race then return false end
+    
+    local track = Tracks[race.trackId]
+    local player = race.leaderboard[playerId]
+    local expectedCheckpoint = (player.checkpoints % #track.checkpoints) + 1
+    
+    -- Validate checkpoint sequence
+    if checkpointId ~= expectedCheckpoint then
+        TriggerClientEvent('zendo-racing:invalidCheckpoint', playerId)
+        return false
+    end
+    
+    player.checkpoints = player.checkpoints + 1
+    local currentTime = GetGameTimer() - race.startTime
+    
+    -- Lap completion detection
+    if checkpointId == #track.checkpoints then
+        self:CompleteLap(playerId, currentTime)
+    end
+    
+    TriggerClientEvent('zendo-racing:checkpointPassed', playerId, checkpointId)
+    return true
+end</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <h4>Lap Timing and Leaderboard</h4>
+                    <pre><code class="language-lua">-- Precise lap timing calculation
+function RaceManager:CompleteLap(playerId, currentTime)
+    local raceId = self.playerRaces[playerId]
+    local race = self.activeRaces[raceId]
+    local player = race.leaderboard[playerId]
+    
+    -- Calculate lap time
+    local lapStartTime = player.lapTimes[race.currentLap[playerId] - 1] or race.startTime
+    local lapTime = currentTime - lapStartTime
+    
+    -- Record lap time
+    table.insert(player.lapTimes, currentTime)
+    
+    -- Update best lap
+    if lapTime < player.bestLap then
+        player.bestLap = lapTime
+        TriggerClientEvent('zendo-racing:newBestLap', playerId, lapTime)
+    end
+    
+    race.currentLap[playerId] = race.currentLap[playerId] + 1
+    
+    -- Update leaderboard positions
+    self:UpdateLeaderboard(raceId)
+    
+    -- Check race completion
+    local track = Tracks[race.trackId]
+    if race.currentLap[playerId] > track.totalLaps then
+        self:PlayerFinished(playerId, currentTime)
+    end
+end
+
+-- Dynamic leaderboard calculation
+function RaceManager:UpdateLeaderboard(raceId)
+    local race = self.activeRaces[raceId]
+    local sortedPlayers = {}
+    
+    -- Create sortable player array
+    for playerId, data in pairs(race.leaderboard) do
+        table.insert(sortedPlayers, {
+            id = playerId,
+            lap = race.currentLap[playerId],
+            checkpoints = data.checkpoints,
+            totalTime = #data.lapTimes > 0 and data.lapTimes[#data.lapTimes] or 999999
+        })
+    end
+    
+    -- Sort by lap, then checkpoints, then time
+    table.sort(sortedPlayers, function(a, b)
+        if a.lap ~= b.lap then return a.lap > b.lap end
+        if a.checkpoints ~= b.checkpoints then return a.checkpoints > b.checkpoints end
+        return a.totalTime < b.totalTime
+    end)
+    
+    -- Update positions and broadcast
+    for position, playerData in ipairs(sortedPlayers) do
+        race.leaderboard[playerData.id].position = position
+        TriggerClientEvent('zendo-racing:positionUpdate', playerData.id, position)
+    end
+    
+    TriggerClientEvent('zendo-racing:leaderboardUpdate', -1, sortedPlayers)
+end</code></pre>
+                </div>
+            </div>
+
+            <div class="technical-details">
+                <h3>Technical Highlights</h3>
+                <ul>
+                    <li><strong>Precision Timing:</strong> Millisecond-accurate lap and split times</li>
+                    <li><strong>Anti-cheat Validation:</strong> Checkpoint sequence verification system</li>
+                    <li><strong>Real-time Leaderboards:</strong> Dynamic position updates during races</li>
+                    <li><strong>Tournament Framework:</strong> Bracket management and scoring system</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Dynamic Speedometer -->
+        <div class="project-detail" id="speedometer">
+            <div class="project-header">
+                <h2><i class="fas fa-tachometer-alt"></i> Dynamic Speedometer</h2>
+                <div class="project-badges">
+                    <span class="badge ui">UI/UX</span>
+                    <span class="badge realtime">Real-time</span>
+                    <span class="badge animation">Animation</span>
+                </div>
+            </div>
+            
+            <div class="project-overview">
+                <h3>Overview</h3>
+                <p>Real-time vehicle speedometer with customizable UI elements, multiple unit support (MPH/KMH), and comprehensive performance metrics display. Features smooth animations, responsive design elements, and integration with vehicle systems for accurate speed calculation.</p>
+                
+                <div class="features-grid">
+                    <div class="feature">
+                        <i class="fas fa-gauge"></i>
+                        <span>Real-time speed tracking</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-palette"></i>
+                        <span>Customizable themes</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>Responsive design</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-chart-area"></i>
+                        <span>Performance metrics</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-section">
+                <h3>Key Code Snippets</h3>
+                
+                <div class="code-block">
+                    <h4>Speed Calculation Engine</h4>
+                    <pre><code class="language-lua">-- Accurate speed calculation and smoothing
+local Speedometer = {}
+Speedometer.config = {
+    updateInterval = 50, -- Update every 50ms for smooth animation
+    smoothingFactor = 0.8,
+    maxSpeed = 300,
+    units = 'mph' -- 'mph' or 'kmh'
+}
+
+local speedHistory = {}
+local currentSpeed = 0
+local targetSpeed = 0
+
+-- Calculate vehicle speed with smoothing
+function Speedometer:CalculateSpeed(vehicle)
+    if not DoesEntityExist(vehicle) then return 0 end
+    
+    local velocity = GetEntityVelocity(vehicle)
+    local speed = math.sqrt(velocity.x^2 + velocity.y^2 + velocity.z^2)
+    
+    -- Convert to appropriate units
+    if self.config.units == 'mph' then
+        speed = speed * 2.236936 -- m/s to mph
+    else
+        speed = speed * 3.6 -- m/s to kmh
+    end
+    
+    -- Apply smoothing to prevent jittery display
+    table.insert(speedHistory, speed)
+    if #speedHistory > 5 then
+        table.remove(speedHistory, 1)
+    end
+    
+    local smoothedSpeed = 0
+    for _, historicalSpeed in pairs(speedHistory) do
+        smoothedSpeed = smoothedSpeed + historicalSpeed
+    end
+    
+    return smoothedSpeed / #speedHistory
+end
+
+-- Update speedometer display
+function Speedometer:UpdateDisplay()
+    local playerVehicle = GetVehiclePedIsIn(PlayerPedId(), false)
+    
+    if playerVehicle ~= 0 then
+        targetSpeed = self:CalculateSpeed(playerVehicle)
+        
+        -- Get additional vehicle data
+        local rpm = GetVehicleCurrentRpm(playerVehicle)
+        local gear = GetVehicleCurrentGear(playerVehicle)
+        local fuel = GetVehicleFuelLevel(playerVehicle)
+        local engineHealth = GetVehicleEngineHealth(playerVehicle)
+        
+        -- Smooth speed transition
+        currentSpeed = currentSpeed + (targetSpeed - currentSpeed) * self.config.smoothingFactor
+        
+        -- Send to UI
+        SendNUIMessage({
+            type = 'updateSpeed',
+            speed = math.floor(currentSpeed),
+            rpm = rpm,
+            gear = gear,
+            fuel = fuel,
+            engineHealth = engineHealth,
+            maxSpeed = self.config.maxSpeed,
+            units = self.config.units
+        })
+    else
+        -- Vehicle exited, hide speedometer
+        SendNUIMessage({
+            type = 'hideSpeedometer'
+        })
+    end
+end</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <h4>UI Animation System</h4>
+                    <pre><code class="language-javascript">// Client-side UI animation and rendering
+class SpeedometerUI {
+    constructor() {
+        this.canvas = document.getElementById('speedometer-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.animationFrame = null;
+        this.currentRotation = 0;
+        this.targetRotation = 0;
+        
+        this.setupCanvas();
+    }
+    
+    // Smooth needle animation
+    animateNeedle(speed, maxSpeed) {
+        const speedPercentage = Math.min(speed / maxSpeed, 1);
+        this.targetRotation = (speedPercentage * 270) - 135; // 270° range, start at -135°
+        
+        // Smooth rotation transition
+        const rotationDiff = this.targetRotation - this.currentRotation;
+        this.currentRotation += rotationDiff * 0.15;
+        
+        this.drawSpeedometer();
+        
+        if (Math.abs(rotationDiff) > 0.5) {
+            this.animationFrame = requestAnimationFrame(() => 
+                this.animateNeedle(speed, maxSpeed)
+            );
+        }
+    }
+    
+    // Draw speedometer with modern styling
+    drawSpeedometer() {
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const radius = 120;
+        
+        // Clear canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw outer ring
+        this.drawGradientCircle(centerX, centerY, radius + 10, '#6366f1', '#4f46e5');
+        
+        // Draw speed markings
+        this.drawSpeedMarkings(centerX, centerY, radius);
+        
+        // Draw needle
+        this.drawNeedle(centerX, centerY, radius - 20);
+        
+        // Draw center hub
+        this.drawGradientCircle(centerX, centerY, 15, '#1f2937', '#111827');
+    }
+    
+    drawGradientCircle(x, y, radius, color1, color2) {
+        const gradient = this.ctx.createRadialGradient(x, y, 0, x, y, radius);
+        gradient.addColorStop(0, color1);
+        gradient.addColorStop(1, color2);
+        
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        this.ctx.fillStyle = gradient;
+        this.ctx.fill();
+    }
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="technical-details">
+                <h3>Technical Highlights</h3>
+                <ul>
+                    <li><strong>Smooth Animation:</strong> 60fps canvas rendering with interpolated transitions</li>
+                    <li><strong>Accurate Calculations:</strong> Physics-based speed measurement with smoothing</li>
+                    <li><strong>Customizable Themes:</strong> Dynamic color schemes and layout options</li>
+                    <li><strong>Performance Optimized:</strong> Efficient rendering with minimal resource usage</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Speed-Zones Manager -->
+        <div class="project-detail" id="speed-zones">
+            <div class="project-header">
+                <h2><i class="fas fa-road"></i> Speed-Zones Manager</h2>
+                <div class="project-badges">
+                    <span class="badge lua">Lua</span>
+                    <span class="badge zones">Zone System</span>
+                    <span class="badge admin">Admin Tools</span>
+                </div>
+            </div>
+            
+            <div class="project-overview">
+                <h3>Overview</h3>
+                <p>Intelligent speed zone management system with automatic speed limit detection, comprehensive violation tracking, and configurable enforcement mechanisms. Features dynamic zone creation, administrative controls, and integration with law enforcement systems.</p>
+                
+                <div class="features-grid">
+                    <div class="feature">
+                        <i class="fas fa-map-marked"></i>
+                        <span>Dynamic zone creation</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Violation detection</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Law enforcement integration</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-cogs"></i>
+                        <span>Administrative controls</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-section">
+                <h3>Key Code Snippets</h3>
+                
+                <div class="code-block">
+                    <h4>Zone Management System</h4>
+                    <pre><code class="language-lua">-- Speed zone creation and management
+local SpeedZones = {}
+SpeedZones.zones = {}
+SpeedZones.playerZones = {}
+SpeedZones.violations = {}
+
+function SpeedZones:CreateZone(zoneId, coords, radius, speedLimit, zoneType)
+    local zone = {
+        id = zoneId,
+        coords = vector3(coords.x, coords.y, coords.z),
+        radius = radius,
+        speedLimit = speedLimit,
+        type = zoneType, -- 'residential', 'highway', 'school', 'construction'
+        active = true,
+        createdAt = os.time(),
+        violations = 0,
+        enforcementLevel = 'warning' -- 'warning', 'fine', 'arrest'
+    }
+    
+    self.zones[zoneId] = zone
+    
+    -- Create client-side zone blip
+    TriggerClientEvent('speed-zones:createZone', -1, zone)
+    
+    print(string.format('[SPEED-ZONES] Created %s zone %s: %d mph limit', 
+          zoneType, zoneId, speedLimit))
+    
+    return zone
+end
+
+-- Real-time zone detection and speed monitoring
+function SpeedZones:MonitorPlayer(playerId)
+    local playerPed = GetPlayerPed(playerId)
+    local playerCoords = GetEntityCoords(playerPed)
+    local vehicle = GetVehiclePedIsIn(playerPed, false)
+    
+    if vehicle == 0 then 
+        self.playerZones[playerId] = nil
+        return 
+    end
+    
+    local speed = GetEntitySpeed(vehicle) * 2.236936 -- Convert to MPH
+    local currentZone = nil
+    
+    -- Check all zones for player position
+    for zoneId, zone in pairs(self.zones) do
+        if zone.active then
+            local distance = #(playerCoords - zone.coords)
+            
+            if distance <= zone.radius then
+                currentZone = zone
+                break
+            end
+        end
+    end
+    
+    -- Handle zone entry/exit
+    if currentZone then
+        self:HandleZoneEntry(playerId, currentZone, speed)
+    else
+        self:HandleZoneExit(playerId)
+    end
+end
+
+-- Zone entry and speed limit enforcement
+function SpeedZones:HandleZoneEntry(playerId, zone, currentSpeed)
+    local previousZone = self.playerZones[playerId]
+    
+    -- First entry into this zone
+    if not previousZone or previousZone.id ~= zone.id then
+        self.playerZones[playerId] = zone
+        TriggerClientEvent('speed-zones:enterZone', playerId, zone)
+    end
+    
+    -- Check for speed violations
+    if currentSpeed > zone.speedLimit then
+        local violation = {
+            playerId = playerId,
+            zoneId = zone.id,
+            speed = currentSpeed,
+            speedLimit = zone.speedLimit,
+            excessSpeed = currentSpeed - zone.speedLimit,
+            timestamp = os.time(),
+            coords = GetEntityCoords(GetPlayerPed(playerId))
+        }
+        
+        self:ProcessViolation(violation, zone)
+    end
+end</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <h4>Violation Processing System</h4>
+                    <pre><code class="language-lua">-- Comprehensive violation handling
+function SpeedZones:ProcessViolation(violation, zone)
+    local playerId = violation.playerId
+    local excessSpeed = violation.excessSpeed
+    
+    -- Initialize player violation history
+    if not self.violations[playerId] then
+        self.violations[playerId] = {}
+    end
+    
+    table.insert(self.violations[playerId], violation)
+    zone.violations = zone.violations + 1
+    
+    -- Determine enforcement action based on excess speed and history
+    local action = self:DetermineEnforcementAction(playerId, excessSpeed, zone)
+    
+    -- Execute enforcement action
+    if action.type == 'warning' then
+        TriggerClientEvent('speed-zones:warning', playerId, {
+            message = string.format('Speed limit: %d mph | Your speed: %d mph', 
+                     zone.speedLimit, math.floor(violation.speed)),
+            excessSpeed = excessSpeed
+        })
+        
+    elseif action.type == 'fine' then
+        local fineAmount = self:CalculateFine(excessSpeed, zone.type)
+        TriggerClientEvent('speed-zones:fine', playerId, {
+            amount = fineAmount,
+            reason = 'Speeding violation',
+            zone = zone.id
+        })
+        
+        -- Notify law enforcement if enabled
+        if zone.enforcementLevel ~= 'warning' then
+            TriggerEvent('police:speedingViolation', violation, fineAmount)
+        end
+        
+    elseif action.type == 'serious' then
+        -- Serious violation - notify all law enforcement
+        TriggerEvent('police:seriousSpeedingViolation', violation)
+        TriggerClientEvent('speed-zones:seriousViolation', playerId, violation)
+    end
+    
+    -- Log violation for analytics
+    self:LogViolation(violation, action)
+end
+
+-- Smart fine calculation based on multiple factors
+function SpeedZones:CalculateFine(excessSpeed, zoneType)
+    local baseFine = 50
+    local speedMultiplier = math.max(1, excessSpeed / 10) -- $5 per mph over
+    
+    -- Zone type modifiers
+    local zoneModifiers = {
+        residential = 1.5,
+        school = 2.0,
+        construction = 1.8,
+        highway = 0.8
+    }
+    
+    local modifier = zoneModifiers[zoneType] or 1.0
+    local totalFine = baseFine * speedMultiplier * modifier
+    
+    return math.floor(totalFine)
+end
+
+-- Administrative zone management
+function SpeedZones:AdminUpdateZone(adminId, zoneId, updates)
+    local zone = self.zones[zoneId]
+    if not zone then return false end
+    
+    -- Validate admin permissions
+    if not self:HasAdminPermission(adminId, 'zone_management') then
+        TriggerClientEvent('speed-zones:notify', adminId, 'Insufficient permissions', 'error')
+        return false
+    end
+    
+    -- Apply updates
+    for key, value in pairs(updates) do
+        if key ~= 'id' and key ~= 'createdAt' then
+            zone[key] = value
+        end
+    end
+    
+    -- Broadcast updates to all clients
+    TriggerClientEvent('speed-zones:zoneUpdated', -1, zone)
+    
+    print(string.format('[SPEED-ZONES] Admin %s updated zone %s', adminId, zoneId))
+    return true
+end</code></pre>
+                </div>
+            </div>
+
+            <div class="technical-details">
+                <h3>Technical Highlights</h3>
+                <ul>
+                    <li><strong>Intelligent Detection:</strong> Efficient spatial algorithms for zone boundaries</li>
+                    <li><strong>Graduated Enforcement:</strong> Smart violation escalation based on severity</li>
+                    <li><strong>Administrative Tools:</strong> Real-time zone modification and management</li>
+                    <li><strong>Integration Ready:</strong> Seamless connection with law enforcement systems</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Portfolio -->
+    <div class="back-to-portfolio">
+        <div class="container">
+            <a href="index.html" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Back to Portfolio
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Anthony Benitez. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Enhanced navigation for projects page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle smooth scrolling to project sections on this page
+            const projectLinks = document.querySelectorAll('a[href^="#"]');
+            projectLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const targetId = link.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        e.preventDefault();
+                        const offsetTop = targetElement.offsetTop - 100;
+                        window.scrollTo({
+                            top: offsetTop,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // Handle navigation highlighting for current page
+            const currentUrl = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if ((currentUrl.includes('projects.html') || currentUrl.endsWith('/projects.html')) && 
+                    href === 'projects.html') {
+                    link.classList.add('active');
+                } else if (href !== 'projects.html') {
+                    link.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

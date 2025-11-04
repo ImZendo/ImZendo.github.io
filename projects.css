@@ -1,0 +1,509 @@
+/* Projects Page Specific Styles */
+
+/* Enhanced Navigation for Projects Page */
+body .navbar {
+    background: rgba(17, 24, 39, 0.98);
+    backdrop-filter: blur(10px);
+}
+
+body .nav-link {
+    color: white !important;
+    font-weight: 500;
+}
+
+body .nav-link:hover {
+    color: #60a5fa !important;
+}
+
+body .nav-link.active {
+    color: #60a5fa !important;
+}
+
+body .nav-link::after {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+}
+
+body .nav-logo a {
+    color: white !important;
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Mobile menu styling for projects page */
+@media (max-width: 768px) {
+    body .nav-menu {
+        background: rgba(17, 24, 39, 0.98);
+        backdrop-filter: blur(10px);
+    }
+    
+    body .bar {
+        background: white;
+    }
+}
+
+/* Header Section */
+.projects-header {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    padding: 8rem 0 4rem;
+    text-align: center;
+    margin-top: 70px;
+}
+
+.page-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: slideInUp 0.8s ease-out 0.2s forwards;
+}
+
+.page-subtitle {
+    font-size: 1.25rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+    opacity: 0;
+    animation: slideInUp 0.8s ease-out 0.4s forwards;
+}
+
+/* Projects Container */
+.projects-container {
+    padding: 4rem 0;
+}
+
+/* Project Detail Cards */
+.project-detail {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-bottom: 4rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.project-detail:nth-child(2) { animation-delay: 0.1s; }
+.project-detail:nth-child(3) { animation-delay: 0.2s; }
+.project-detail:nth-child(4) { animation-delay: 0.3s; }
+.project-detail:nth-child(5) { animation-delay: 0.4s; }
+
+.project-detail:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Project Headers */
+.project-header {
+    background: linear-gradient(135deg, var(--bg-secondary), #f3f4f6);
+    padding: 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.project-header h2 {
+    font-size: 2rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.project-header h2 i {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
+
+.project-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge.lua { background: #000080; color: white; }
+.badge.database { background: #f59e0b; color: white; }
+.badge.realtime { background: #10b981; color: white; }
+.badge.multiplayer { background: #8b5cf6; color: white; }
+.badge.ui { background: #ec4899; color: white; }
+.badge.animation { background: #06b6d4; color: white; }
+.badge.zones { background: #84cc16; color: white; }
+.badge.admin { background: #ef4444; color: white; }
+
+/* Project Content */
+.project-overview,
+.code-section,
+.technical-details {
+    padding: 2rem;
+}
+
+.project-overview h3,
+.code-section h3,
+.technical-details h3 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.project-overview h3::after {
+    content: '';
+    position: absolute;
+    bottom: -0.5rem;
+    left: 0;
+    width: 3rem;
+    height: 3px;
+    background: var(--gradient-primary);
+    border-radius: 2px;
+}
+
+.project-overview p {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+}
+
+/* Features Grid */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.feature:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: scale(1.02);
+}
+
+.feature i {
+    color: var(--primary-color);
+    font-size: 1.25rem;
+    width: 20px;
+    text-align: center;
+}
+
+.feature:hover i {
+    color: white;
+}
+
+.feature span {
+    font-weight: 500;
+}
+
+/* Code Section */
+.code-section {
+    background: #1a1a1a;
+    color: #e5e5e5;
+}
+
+.code-section h3 {
+    color: white;
+}
+
+.code-block {
+    margin-bottom: 3rem;
+}
+
+.code-block h4 {
+    color: #60a5fa;
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--primary-color);
+}
+
+.code-block pre {
+    background: #111827 !important;
+    border-radius: 0.5rem;
+    padding: 1.5rem !important;
+    margin: 0;
+    overflow-x: auto;
+    border: 1px solid #374151;
+    position: relative;
+}
+
+.code-block pre::before {
+    content: attr(data-language);
+    position: absolute;
+    top: 0.5rem;
+    right: 1rem;
+    background: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.code-block pre code {
+    font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+/* Syntax highlighting improvements */
+.token.comment { color: #6b7280; font-style: italic; }
+.token.keyword { color: #8b5cf6; font-weight: bold; }
+.token.string { color: #10b981; }
+.token.number { color: #f59e0b; }
+.token.function { color: #60a5fa; }
+.token.operator { color: #e5e7eb; }
+.token.punctuation { color: #9ca3af; }
+
+/* Technical Details */
+.technical-details {
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+}
+
+.technical-details ul {
+    list-style: none;
+    padding: 0;
+}
+
+.technical-details li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.technical-details li::before {
+    content: '⚡';
+    font-size: 1.25rem;
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+.technical-details li:last-child {
+    border-bottom: none;
+}
+
+.technical-details strong {
+    color: var(--primary-color);
+}
+
+/* Back to Portfolio */
+.back-to-portfolio {
+    text-align: center;
+    padding: 3rem 0;
+    background: var(--bg-secondary);
+}
+
+.back-to-portfolio .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Animations */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .projects-header {
+        padding: 6rem 0 3rem;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .project-header,
+    .project-overview,
+    .code-section,
+    .technical-details {
+        padding: 1.5rem;
+    }
+    
+    .project-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .code-block pre {
+        padding: 1rem !important;
+        font-size: 0.75rem;
+    }
+    
+    .project-badges {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .projects-container {
+        padding: 2rem 0;
+    }
+    
+    .project-detail {
+        margin-bottom: 2rem;
+    }
+    
+    .project-header h2 {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .code-block pre {
+        overflow-x: scroll;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .navbar,
+    .back-to-portfolio,
+    .footer {
+        display: none;
+    }
+    
+    .projects-header {
+        margin-top: 0;
+        page-break-after: avoid;
+    }
+    
+    .project-detail {
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+    
+    .code-section {
+        background: white !important;
+        color: black !important;
+    }
+    
+    .code-block pre {
+        background: #f5f5f5 !important;
+        color: black !important;
+        border: 1px solid #ccc;
+    }
+}
+
+/* Dark mode enhancements */
+@media (prefers-color-scheme: dark) {
+    .project-detail {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+    }
+    
+    .project-header {
+        background: linear-gradient(135deg, var(--bg-dark), #1f2937);
+    }
+    
+    .technical-details {
+        background: var(--bg-dark);
+    }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    .project-detail {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+    
+    .page-title,
+    .page-subtitle {
+        animation: none;
+        opacity: 1;
+    }
+    
+    .project-detail:hover {
+        transform: none;
+    }
+    
+    .feature:hover {
+        transform: none;
+    }
+}
+
+/* Focus styles for accessibility */
+.project-detail:focus-within {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Smooth scrolling for anchor links */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Code copy functionality */
+.code-block {
+    position: relative;
+}
+
+.copy-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.code-block:hover .copy-button {
+    opacity: 1;
+}
+
+.copy-button:hover {
+    background: var(--primary-dark);
+}
