@@ -798,10 +798,599 @@ end</code></pre>
                 </ul>
             </div>
         </div>
+
+        <!-- Interaction Core System -->
+        <div class="project-detail" id="interaction-core">
+            <div class="project-header">
+                <h2><i class="fas fa-code"></i> Interaction Core System</h2>
+                <div class="project-badges">
+                    <span class="badge lua">Lua</span>
+                    <span class="badge framework">Framework</span>
+                    <span class="badge api">API Design</span>
+                </div>
+            </div>
+            
+            <div class="project-overview">
+                <h3>Overview</h3>
+                <p>Advanced interaction framework for FiveM servers providing a flexible, extensible system for creating interactive elements. Features multiple interaction types, conditional logic, performance optimization, and a comprehensive API with extensive documentation for developers.</p>
+                
+                <div class="features-grid">
+                    <div class="feature">
+                        <i class="fas fa-mouse-pointer"></i>
+                        <span>Multiple interaction types</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-code-branch"></i>
+                        <span>Conditional logic system</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Performance optimized</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-book"></i>
+                        <span>Comprehensive API</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-section">
+                <h3>Key Code Snippets</h3>
+                
+                <div class="code-block">
+                    <h4>Core Interaction Framework</h4>
+                    <pre><code class="language-lua">-- Advanced interaction creation system
+function InteractionCore:CreateInteraction(data)
+    local interactionId = data.id or self:GenerateId()
+    
+    local interaction = {
+        id = interactionId,
+        coords = data.coords or vector3(0, 0, 0),
+        distance = data.distance or self.Config.maxInteractionDistance,
+        type = data.type or self.Types.SIMPLE,
+        helpText = data.helpText or 'Press ~INPUT_CONTEXT~ to interact',
+        callback = data.callback,
+        conditions = data.conditions or {},
+        cooldown = data.cooldown or self.Config.cooldownTime,
+        
+        -- Advanced features
+        animation = data.animation,
+        progressBar = data.progressBar,
+        menu = data.menu,
+        
+        -- Conditional requirements
+        job = data.job,
+        gang = data.gang,
+        item = data.item,
+        
+        -- Visual elements
+        blip = data.blip,
+        marker = data.marker,
+        
+        active = true,
+        lastUsed = 0
+    }
+    
+    self.interactions[interactionId] = interaction
+    
+    -- Create visual elements
+    if interaction.blip then
+        self:CreateInteractionBlip(interaction)
+    end
+    
+    if interaction.marker then
+        self:CreateInteractionMarker(interaction)
+    end
+    
+    return interactionId
+end
+
+-- Intelligent interaction processing
+function InteractionCore:ProcessInteraction()
+    local playerPed = PlayerPedId()
+    local closestInteraction = self:GetClosestActiveInteraction()
+    
+    if not closestInteraction then return end
+    
+    -- Cooldown check
+    if GetGameTimer() - closestInteraction.lastUsed < closestInteraction.cooldown then
+        return
+    end
+    
+    -- Advanced condition validation
+    if not self:ValidateConditions(closestInteraction, playerPed) then
+        return
+    end
+    
+    closestInteraction.lastUsed = GetGameTimer()
+    self:HandleInteractionType(closestInteraction, playerPed)
+end</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <h4>Multiple Interaction Types Handler</h4>
+                    <pre><code class="language-lua">-- Flexible interaction type system
+function InteractionCore:HandleInteractionType(interaction, playerPed)
+    local interactionType = interaction.type
+    
+    if interactionType == self.Types.SIMPLE then
+        -- Immediate callback execution
+        self:HandleSimpleInteraction(interaction)
+        
+    elseif interactionType == self.Types.ANIMATED then
+        -- Animation-based interaction
+        if interaction.animation then
+            local animDict = interaction.animation.dict
+            local animName = interaction.animation.name
+            local duration = interaction.animation.duration or 2000
+            
+            RequestAnimDict(animDict)
+            while not HasAnimDictLoaded(animDict) do Wait(100) end
+            
+            TaskPlayAnim(playerPed, animDict, animName, 8.0, 8.0, duration, 0, 0, false, false, false)
+            Wait(duration)
+            ClearPedTasks(playerPed)
+            RemoveAnimDict(animDict)
+        end
+        
+        if interaction.callback then
+            interaction.callback(interaction.data)
+        end
+        
+    elseif interactionType == self.Types.PROGRESSIVE then
+        -- Progress bar interaction
+        if interaction.progressBar then
+            local progressData = {
+                duration = interaction.progressBar.duration or 5000,
+                label = interaction.progressBar.label or 'Processing...',
+                canCancel = interaction.progressBar.canCancel or true,
+                disableMovement = interaction.progressBar.disableMovement or true
+            }
+            
+            self:ShowProgressBar(progressData, function(success)
+                if success and interaction.callback then
+                    interaction.callback(interaction.data)
+                end
+            end)
+        end
+        
+    elseif interactionType == self.Types.CONDITIONAL then
+        -- Advanced conditional logic
+        self:HandleConditionalInteraction(interaction)
+        
+    elseif interactionType == self.Types.TIMED then
+        -- Time-based interaction requiring sustained presence
+        local timerDuration = interaction.timer or 10000
+        local startTime = GetGameTimer()
+        
+        Citizen.CreateThread(function()
+            while GetGameTimer() - startTime < timerDuration do
+                local currentCoords = GetEntityCoords(playerPed)
+                if #(currentCoords - interaction.coords) > interaction.distance then
+                    return -- Player moved away, cancel
+                end
+                Wait(100)
+            end
+            
+            if interaction.callback then
+                interaction.callback(interaction.data)
+            end
+        end)
+    end
+end</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <h4>Advanced Condition Validation System</h4>
+                    <pre><code class="language-lua">-- Comprehensive condition validation
+function InteractionCore:ValidateConditions(interaction, playerPed)
+    -- Job requirement validation
+    if interaction.job then
+        local PlayerData = QBCore.Functions.GetPlayerData()
+        if PlayerData.job.name ~= interaction.job then
+            return false
+        end
+    end
+    
+    -- Gang requirement validation
+    if interaction.gang then
+        local PlayerData = QBCore.Functions.GetPlayerData()
+        if PlayerData.gang.name ~= interaction.gang then
+            return false
+        end
+    end
+    
+    -- Item requirement validation
+    if interaction.item then
+        if not self:PlayerHasItem(interaction.item) then
+            return false
+        end
+    end
+    
+    -- Custom conditions validation
+    if interaction.conditions and type(interaction.conditions) == 'table' then
+        for _, condition in pairs(interaction.conditions) do
+            if type(condition) == 'function' and not condition() then
+                return false
+            end
+        end
+    end
+    
+    return true
+end
+
+-- Performance-optimized distance checking
+function InteractionCore:StartInteractionThread()
+    Citizen.CreateThread(function()
+        while true do
+            local sleep = 500
+            local playerPed = PlayerPedId()
+            local playerCoords = GetEntityCoords(playerPed)
+            
+            self.activeInteractions = {}
+            
+            -- Efficient spatial checking
+            for id, interaction in pairs(self.interactions) do
+                if self:IsInteractionValid(interaction, playerPed, playerCoords) then
+                    local distance = #(playerCoords - interaction.coords)
+                    
+                    if distance <= interaction.distance then
+                        self.activeInteractions[id] = interaction
+                        sleep = 0 -- Active interaction found, reduce sleep
+                        
+                        if self.Config.showHelpText and interaction.helpText then
+                            self:ShowHelpText(interaction.helpText)
+                        end
+                    end
+                end
+            end
+            
+            Wait(sleep)
+        end
+    end)
+end</code></pre>
+                </div>
+            </div>
+
+            <div class="technical-details">
+                <h3>Technical Highlights</h3>
+                <ul>
+                    <li><strong>Modular Architecture:</strong> Extensible design supporting custom interaction types</li>
+                    <li><strong>Performance Optimization:</strong> Dynamic sleep values and spatial optimizations</li>
+                    <li><strong>Advanced Conditions:</strong> Job, gang, item, and custom function-based validation</li>
+                    <li><strong>Developer Experience:</strong> Clean API with comprehensive documentation and examples</li>
+                    <li><strong>Visual Integration:</strong> Support for blips, markers, and help text systems</li>
+                    <li><strong>Framework Agnostic:</strong> Easy integration with any FiveM framework</li>
+                </ul>
+            </div>
+
+            <div class="download-section">
+                <h3>Available Downloads</h3>
+                <div class="download-grid">
+                    <a href="downloads/interaction-core.lua" class="download-card" download>
+                        <div class="download-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="download-content">
+                            <h4>interaction-core.lua</h4>
+                            <p>Main framework file with all core functionality</p>
+                        </div>
+                    </a>
+                    <a href="downloads/interaction-core-examples.lua" class="download-card" download>
+                        <div class="download-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="download-content">
+                            <h4>Usage Examples</h4>
+                            <p>Advanced implementation examples and use cases</p>
+                        </div>
+                    </a>
+                    <a href="downloads/README-interaction-core.md" class="download-card" download>
+                        <div class="download-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="download-content">
+                            <h4>Documentation</h4>
+                            <p>Complete API documentation and usage examples</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lockpick Job System -->
+        <div class="project-detail" id="lockpick-job">
+            <div class="project-header">
+                <h2><i class="fas fa-key"></i> Lockpick Job System <span class="free-download">FREE DOWNLOAD</span></h2>
+                <div class="project-badges">
+                    <span class="badge lua">Lua</span>
+                    <span class="badge database">MySQL</span>
+                    <span class="badge job">Job System</span>
+                    <span class="badge free">Free</span>
+                </div>
+            </div>
+            
+            <div class="project-overview">
+                <h3>Overview</h3>
+                <p>Complete lockpicking job system for FiveM servers featuring skill progression, dynamic rewards, database integration, and comprehensive administrative controls. Includes anti-exploit protection and extensive customization options. <strong>Available as a free download with full source code!</strong></p>
+                
+                <div class="features-grid">
+                    <div class="feature">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Skill progression system</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-database"></i>
+                        <span>MySQL integration</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Anti-exploit protection</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-cogs"></i>
+                        <span>Admin controls</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-section">
+                <h3>Key Code Snippets</h3>
+                
+                <div class="code-block">
+                    <h4>Job Management and Assignment</h4>
+                    <pre><code class="language-lua">-- Dynamic job creation and player assignment
+function StartLockpickJob()
+    local randomLocation = Config.Locations[math.random(1, #Config.Locations)]
+    
+    currentJobData = {
+        location = randomLocation,
+        startTime = GetGameTimer(),
+        completed = false
+    }
+    
+    isDoingLockpickJob = true
+    CreateJobBlip(randomLocation.coords)
+    
+    QBCore.Functions.Notify('New lockpick job available! Check your GPS.', 'success')
+    TriggerServerEvent('lockpick-job:server:jobStarted', currentJobData)
+end
+
+-- Advanced lockpicking minigame with skill-based success rates
+function StartLockpickingMinigame(difficulty)
+    local success = false
+    local attempts = 3
+    
+    while attempts > 0 and not success do
+        QBCore.Functions.Notify(string.format('Lockpicking... Attempt %d/3', 4 - attempts), 'primary')
+        
+        -- Skill-based success calculation
+        local skillChance = math.min((lockpickSkill / Config.MaxSkillLevel) * 100, 85)
+        local difficultyModifier = (1 - (difficulty * 0.15))
+        local finalChance = skillChance * difficultyModifier
+        
+        Wait(3000) -- Minigame simulation
+        
+        local randomRoll = math.random(1, 100)
+        
+        if randomRoll <= finalChance then
+            success = true
+            QBCore.Functions.Notify('Lock picked successfully!', 'success')
+        else
+            attempts = attempts - 1
+            if attempts > 0 then
+                QBCore.Functions.Notify('Failed! Try again.', 'error')
+            end
+        end
+    end
+    
+    return success
+end</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <h4>Skill Progression and Reward System</h4>
+                    <pre><code class="language-lua">-- Intelligent skill progression and reward calculation
+function CompleteLockpickJob(success)
+    if not isDoingLockpickJob then return end
+    
+    local reward = 0
+    local skillGain = 0
+    
+    if success then
+        local difficulty = currentJobData.location.difficulty
+        -- Dynamic reward calculation based on skill and difficulty
+        reward = Config.BaseReward * difficulty * (1 + (lockpickSkill / Config.MaxSkillLevel))
+        skillGain = Config.SkillIncrement * difficulty
+        
+        -- Progressive skill system with diminishing returns
+        lockpickSkill = math.min(lockpickSkill + skillGain, Config.MaxSkillLevel)
+        
+        QBCore.Functions.Notify(string.format('Job completed! Earned $%d and %d skill XP', 
+                               math.floor(reward), skillGain), 'success')
+    end
+    
+    -- Clean up job state
+    if currentJobData.blip then
+        RemoveBlip(currentJobData.blip)
+    end
+    
+    isDoingLockpickJob = false
+    currentJobData = {}
+    
+    -- Server synchronization
+    TriggerServerEvent('lockpick-job:server:jobCompleted', {
+        success = success,
+        reward = reward,
+        skillGain = skillGain,
+        newSkillLevel = lockpickSkill
+    })
+end
+
+-- Server-side reward processing and validation
+RegisterNetEvent('lockpick-job:server:jobCompleted', function(completionData)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    
+    if completionData.success then
+        -- Update player skill and statistics
+        playerSkillData[Player.PlayerData.citizenid].skillLevel = completionData.newSkillLevel
+        playerSkillData[Player.PlayerData.citizenid].jobsCompleted = 
+            playerSkillData[Player.PlayerData.citizenid].jobsCompleted + 1
+        
+        -- Award money with validation
+        Player.Functions.AddMoney('cash', completionData.reward, 'lockpick-job-reward')
+        
+        -- Persistent storage
+        SavePlayerSkillData(Player.PlayerData.citizenid)
+        
+        -- Update client
+        TriggerClientEvent('lockpick-job:client:updateSkill', src, completionData.newSkillLevel)
+    end
+end)</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <h4>Database Integration and Admin Tools</h4>
+                    <pre><code class="language-lua">-- Persistent player skill tracking with MySQL
+local function LoadPlayerSkillData(citizenid)
+    MySQL.Async.fetchAll('SELECT * FROM player_lockpick_skills WHERE citizenid = ?', {citizenid}, 
+    function(result)
+        if result[1] then
+            playerSkillData[citizenid] = {
+                skillLevel = result[1].skill_level or 0,
+                jobsCompleted = result[1].jobs_completed or 0,
+                lastJobTime = result[1].last_job_time
+            }
+        else
+            -- Create new player record
+            MySQL.Async.execute('INSERT INTO player_lockpick_skills (citizenid) VALUES (?)', {citizenid})
+            playerSkillData[citizenid] = {skillLevel = 0, jobsCompleted = 0, lastJobTime = nil}
+        end
+        
+        -- Sync with client
+        local Player = QBCore.Functions.GetPlayerByCitizenId(citizenid)
+        if Player then
+            TriggerClientEvent('lockpick-job:client:updateSkill', Player.PlayerData.source, 
+                             playerSkillData[citizenid].skillLevel)
+        end
+    end)
+end
+
+-- Administrative commands for server management
+QBCore.Commands.Add('setlockpickskill', 'Set a player\'s lockpick skill level (Admin Only)', {
+    {name = 'id', help = 'Player ID'},
+    {name = 'skill', help = 'Skill Level (0-100)'}
+}, true, function(source, args)
+    local targetId = tonumber(args[1])
+    local skillLevel = tonumber(args[2])
+    
+    if skillLevel < 0 or skillLevel > Config.MaxSkillLevel then
+        TriggerClientEvent('QBCore:Notify', source, 
+                          'Skill level must be between 0 and ' .. Config.MaxSkillLevel, 'error')
+        return
+    end
+    
+    local TargetPlayer = QBCore.Functions.GetPlayer(targetId)
+    if TargetPlayer then
+        local citizenid = TargetPlayer.PlayerData.citizenid
+        
+        if not playerSkillData[citizenid] then
+            playerSkillData[citizenid] = {skillLevel = 0, jobsCompleted = 0}
+        end
+        
+        playerSkillData[citizenid].skillLevel = skillLevel
+        SavePlayerSkillData(citizenid)
+        
+        TriggerClientEvent('lockpick-job:client:updateSkill', targetId, skillLevel)
+        TriggerClientEvent('QBCore:Notify', source, 
+                          string.format('Set %s\'s lockpick skill to %d', 
+                                       TargetPlayer.PlayerData.name, skillLevel), 'success')
+    end
+end, 'admin')</code></pre>
+                </div>
+            </div>
+
+            <div class="technical-details">
+                <h3>Technical Highlights</h3>
+                <ul>
+                    <li><strong>Skill Progression:</strong> Dynamic skill system with configurable progression rates</li>
+                    <li><strong>Database Integration:</strong> MySQL storage for persistent player data</li>
+                    <li><strong>Anti-Exploit:</strong> Server-side validation and cooldown systems</li>
+                    <li><strong>Administrative Tools:</strong> Complete admin commands for player management</li>
+                    <li><strong>Framework Integration:</strong> Native QBCore integration with easy adaptation</li>
+                    <li><strong>Customizable Locations:</strong> Easy configuration of job locations and difficulty</li>
+                </ul>
+            </div>
+
+            <div class="download-section">
+                <h3>Free Download Package</h3>
+                <p class="download-description">Get the complete lockpick job system absolutely free! Includes full source code, documentation, and installation guide.</p>
+                
+                <div class="download-grid">
+                    <a href="downloads/" class="download-card featured-download">
+                        <div class="download-icon">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="download-content">
+                            <h4>Complete Package</h4>
+                            <p>Download all files with dedicated page and easy access</p>
+                        </div>
+                    </a>
+                    <a href="downloads/lockpick-job-client.lua" class="download-card" download>
+                        <div class="download-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="download-content">
+                            <h4>Client Script</h4>
+                            <p>Complete client-side implementation with UI and interactions</p>
+                        </div>
+                    </a>
+                    <a href="downloads/lockpick-job-server.lua" class="download-card" download>
+                        <div class="download-icon">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div class="download-content">
+                            <h4>Server Script</h4>
+                            <p>Server-side logic with database integration and admin commands</p>
+                        </div>
+                    </a>
+                    <a href="downloads/fxmanifest.lua" class="download-card" download>
+                        <div class="download-icon">
+                            <i class="fas fa-file-code"></i>
+                        </div>
+                        <div class="download-content">
+                            <h4>FXManifest</h4>
+                            <p>FiveM resource manifest file for easy installation</p>
+                        </div>
+                    </a>
+                    <a href="downloads/README-lockpick-job.md" class="download-card" download>
+                        <div class="download-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="download-content">
+                            <h4>Installation Guide</h4>
+                            <p>Complete setup instructions and configuration documentation</p>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="download-features">
+                    <h4>What's Included:</h4>
+                    <ul>
+                        <li>✅ Complete source code for both client and server</li>
+                        <li>✅ MySQL database schema and setup</li>
+                        <li>✅ Comprehensive installation documentation</li>
+                        <li>✅ Configuration examples and customization guide</li>
+                        <li>✅ Admin commands and management tools</li>
+                        <li>✅ Framework integration instructions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Back to Portfolio -->
-    <div class="back-to-portfolio">
         <div class="container">
             <a href="index.html" class="btn btn-primary">
                 <i class="fas fa-arrow-left"></i> Back to Portfolio

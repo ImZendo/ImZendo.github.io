@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Lockpick Job System - Anthony Benitez</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .download-page {
+            padding: 8rem 0 4rem;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+        }
+        
+        .download-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+        
+        .download-header {
+            margin-bottom: 3rem;
+        }
+        
+        .download-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff, #f1f5f9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .download-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .download-files {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .file-download {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .file-download:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+        }
+        
+        .file-download h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .file-download p {
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+        }
+        
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: white;
+            color: var(--primary-color);
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .download-btn:hover {
+            background: #f8fafc;
+            transform: scale(1.05);
+            text-decoration: none;
+            color: var(--primary-dark);
+        }
+        
+        .back-link {
+            margin-top: 2rem;
+        }
+        
+        .back-link a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .back-link a:hover {
+            color: white;
+        }
+        
+        .features-list {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+        
+        .features-list h3 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .features-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .features-list li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .features-list li::before {
+            content: '✅';
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="download-page">
+        <div class="download-container">
+            <div class="download-header">
+                <h1><i class="fas fa-key"></i> Lockpick Job System</h1>
+                <p>Complete FiveM lockpicking job system with skill progression, database integration, and admin controls. Download the full source code for free!</p>
+            </div>
+            
+            <div class="features-list">
+                <h3>What's Included</h3>
+                <ul>
+                    <li>Complete client and server-side implementation</li>
+                    <li>MySQL database integration with persistent skill tracking</li>
+                    <li>Skill progression system with configurable difficulty levels</li>
+                    <li>Administrative commands for player management</li>
+                    <li>Anti-exploit protection and validation systems</li>
+                    <li>Comprehensive documentation and installation guide</li>
+                    <li>Ready-to-use FXManifest for easy setup</li>
+                    <li>QBCore framework integration (easily adaptable)</li>
+                    <li>Customizable job locations and reward systems</li>
+                </ul>
+            </div>
+            
+            <div class="download-files">
+                <div class="file-download">
+                    <h3><i class="fas fa-desktop"></i> Client Script</h3>
+                    <p>Complete client-side implementation with user interface, job management, and skill progression system.</p>
+                    <a href="lockpick-job-client.lua" class="download-btn" download>
+                        <i class="fas fa-download"></i>
+                        Download Client Script
+                    </a>
+                </div>
+                
+                <div class="file-download">
+                    <h3><i class="fas fa-server"></i> Server Script</h3>
+                    <p>Server-side logic with database integration, admin commands, and player data management.</p>
+                    <a href="lockpick-job-server.lua" class="download-btn" download>
+                        <i class="fas fa-download"></i>
+                        Download Server Script
+                    </a>
+                </div>
+                
+                <div class="file-download">
+                    <h3><i class="fas fa-file-code"></i> FXManifest</h3>
+                    <p>FiveM resource manifest file for easy installation and dependency management.</p>
+                    <a href="fxmanifest.lua" class="download-btn" download>
+                        <i class="fas fa-download"></i>
+                        Download Manifest
+                    </a>
+                </div>
+                
+                <div class="file-download">
+                    <h3><i class="fas fa-book"></i> Documentation</h3>
+                    <p>Complete installation guide, configuration instructions, and API documentation.</p>
+                    <a href="README-lockpick-job.md" class="download-btn" download>
+                        <i class="fas fa-download"></i>
+                        Download Documentation
+                    </a>
+                </div>
+            </div>
+            
+            <div class="back-link">
+                <a href="../projects.html#lockpick-job">← Back to Project Details</a> | 
+                <a href="../index.html">← Back to Portfolio</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

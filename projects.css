@@ -507,3 +507,202 @@ html {
 .copy-button:hover {
     background: var(--primary-dark);
 }
+
+/* Download Section Styles */
+.download-section {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 1rem;
+    border: 1px solid var(--border-color);
+}
+
+.download-section h3 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.download-section h3::before {
+    content: '📥';
+    font-size: 1.5rem;
+}
+
+.download-description {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.download-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.download-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: 0.75rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+}
+
+.download-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+.download-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border-radius: 0.5rem;
+    font-size: 1.25rem;
+}
+
+.download-content h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--text-primary);
+}
+
+.download-content p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.download-features {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+}
+
+.download-features h4 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.download-features ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.download-features li {
+    padding: 0.5rem 0;
+    color: var(--text-secondary);
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.download-features li:last-child {
+    border-bottom: none;
+}
+
+/* Free Download Badge */
+.free-download {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    margin-left: 1rem;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from { box-shadow: 0 0 5px rgba(16, 185, 129, 0.5); }
+    to { box-shadow: 0 0 20px rgba(16, 185, 129, 0.8); }
+}
+
+/* Additional Badge Styles */
+.badge.free {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    font-weight: 600;
+}
+
+.badge.framework {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+}
+
+.badge.api {
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    color: white;
+}
+
+.badge.job {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+/* Featured Download Card */
+.featured-download {
+    border: 2px solid var(--accent-color) !important;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05)) !important;
+}
+
+.featured-download:hover {
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.3) !important;
+}
+
+.featured-download .download-icon {
+    background: linear-gradient(135deg, var(--accent-color), #059669) !important;
+}
+
+/* Enhanced Responsive Design for Downloads */
+@media (max-width: 768px) {
+    .download-section {
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .download-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .download-card {
+        padding: 1rem;
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .download-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1rem;
+    }
+    
+    .free-download {
+        display: block;
+        margin: 0.5rem 0 0 0;
+        text-align: center;
+        font-size: 0.75rem;
+    }
+}
