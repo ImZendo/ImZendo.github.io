@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 // Send email using EmailJS
                 const result = await emailjs.sendForm(
-                    'service_8isx0oc', // Replace with your EmailJS service ID
+                    'service_ppygicm', // Replace with your EmailJS service ID
                     'template_6qzbfmq', // Replace with your EmailJS template ID
                     contactForm
                 );
