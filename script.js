@@ -266,22 +266,59 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Form handling
-    const contactForm = document.querySelector('.contact-form');
+    // Initialize EmailJS
+    emailjs.init("BZu9aVgWHzTC4_Ioc"); // Replace with your EmailJS public key
+
+    // Form handling with EmailJS
+    const contactForm = document.getElementById('contact-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const btnText = document.querySelector('.btn-text');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const formStatus = document.getElementById('form-status');
+
     if (contactForm) {
-        contactForm.addEventListener('submit', (e) => {
+        contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Get form data
-            const formData = new FormData(contactForm);
-            const data = Object.fromEntries(formData);
+            // Show loading state
+            btnText.style.display = 'none';
+            loadingSpinner.style.display = 'inline-block';
+            submitBtn.disabled = true;
             
-            // Show success message (you can customize this)
-            showNotification('Message sent successfully! I\'ll get back to you soon.', 'success');
-            
-            // Reset form
-            contactForm.reset();
+            try {
+                // Send email using EmailJS
+                const result = await emailjs.sendForm(
+                    'service_8isx0oc', // Replace with your EmailJS service ID
+                    'template_6qzbfmq', // Replace with your EmailJS template ID
+                    contactForm
+                );
+                
+                console.log('Email sent successfully:', result);
+                showFormStatus('Message sent successfully! I\'ll get back to you soon.', 'success');
+                contactForm.reset();
+                
+            } catch (error) {
+                console.error('Email sending failed:', error);
+                showFormStatus('Failed to send message. Please try again or contact me directly.', 'error');
+            } finally {
+                // Reset button state
+                btnText.style.display = 'inline-block';
+                loadingSpinner.style.display = 'none';
+                submitBtn.disabled = false;
+            }
         });
+    }
+
+    // Form status display function
+    function showFormStatus(message, type) {
+        formStatus.textContent = message;
+        formStatus.className = `form-status ${type}`;
+        formStatus.style.display = 'block';
+        
+        // Hide status after 5 seconds
+        setTimeout(() => {
+            formStatus.style.display = 'none';
+        }, 5000);
     }
 
     // Notification system
