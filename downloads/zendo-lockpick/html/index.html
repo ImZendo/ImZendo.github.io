@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lockpicking Minigame</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="lockpick-container" class="hidden">
+        <!-- Header -->
+        <div class="header">
+            <h2>Lockpicking</h2>
+            <div class="timer-container">
+                <div class="timer-bar">
+                    <div id="timer-progress" class="timer-progress"></div>
+                </div>
+                <span id="timer-text">30s</span>
+            </div>
+        </div>
+
+        <!-- Main Game Area -->
+        <div class="game-area">
+            <!-- Circle Minigame -->
+            <div id="circle-game" class="minigame-type">
+                <div class="lock-container">
+                    <div class="lock-outer">
+                        <div class="lock-inner">
+                            <div id="sweet-spot" class="sweet-spot"></div>
+                            <div id="picker" class="picker"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pins-container">
+                    <div class="pin" data-pin="0"><div class="pin-indicator"></div></div>
+                    <div class="pin" data-pin="1"><div class="pin-indicator"></div></div>
+                    <div class="pin" data-pin="2"><div class="pin-indicator"></div></div>
+                    <div class="pin" data-pin="3"><div class="pin-indicator"></div></div>
+                    <div class="pin" data-pin="4"><div class="pin-indicator"></div></div>
+                </div>
+            </div>
+
+            <!-- Skillcheck Minigame -->
+            <div id="skillcheck-game" class="minigame-type hidden">
+                <div class="skillcheck-container">
+                    <div class="skillcheck-circle">
+                        <div id="skillcheck-success-zone" class="success-zone"></div>
+                        <div id="skillcheck-needle" class="needle"></div>
+                    </div>
+                </div>
+                <div class="attempts-container">
+                    <div class="attempt active" data-attempt="0"></div>
+                    <div class="attempt" data-attempt="1"></div>
+                    <div class="attempt" data-attempt="2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="instructions">
+            <div id="circle-instructions" class="instruction-set">
+                <p><strong>Instructions:</strong></p>
+                <p>• Press <span class="key">SPACE</span> when the picker is in the sweet spot</p>
+                <p>• Pick all pins to unlock the vehicle</p>
+            </div>
+            <div id="skillcheck-instructions" class="instruction-set hidden">
+                <p><strong>Instructions:</strong></p>
+                <p>• Press <span class="key">SPACE</span> when the needle is in the green zone</p>
+                <p>• Complete 3 successful checks to unlock</p>
+            </div>
+        </div>
+
+        <!-- Status -->
+        <div class="status">
+            <div id="difficulty-indicator" class="difficulty">Difficulty: Medium</div>
+            <div id="attempts-left" class="attempts">Attempts: 3/3</div>
+        </div>
+    </div>
+
+
+
+    <!-- Popup Notifications -->
+    <div id="notification-popup" class="notification-popup hidden">
+        <div class="notification-content">
+            <div id="notification-icon" class="notification-icon"></div>
+            <div id="notification-title" class="notification-title"></div>
+            <div id="notification-message" class="notification-message"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
