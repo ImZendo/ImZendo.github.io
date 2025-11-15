@@ -3,7 +3,7 @@ game 'gta5'
 
 name 'Zendo Lockpick'
 description 'Advanced lockpicking system with interactive minigame'
-author 'Zendo'
+author 'ImZendo'
 version '1.0.0'
 
 -- Dependencies

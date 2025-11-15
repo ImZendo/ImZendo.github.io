@@ -3,7 +3,7 @@ game 'gta5'
 
 name 'interaction_core'
 description 'Leak-free interaction system for FiveM - standalone, crash-safe, memory optimized'
-author 'InteractionCore Team'
+author 'ImZendo'
 version '2.0.0-leakfree'
 
 -- Load order is critical for leak-free operation
@@ -21,19 +21,29 @@ server_scripts {
 }
 
 -- Minimal exports to prevent memory issues
-exports {
+client_exports {
     'RegisterInteraction',
     'RemoveInteraction', 
     'GetInteraction',
+    'GetAllInteractions',
     'IsPlayerInInteraction',
     'GetCurrentInteraction',
-    'CancelCurrentInteraction'
+    'CancelCurrentInteraction',
+    -- Unified UI System
+    'ShowUnifiedPrompt',
+    'HideUnifiedPrompt',
+    'ShowUnifiedProgress',
+    'UpdateUnifiedProgress',
+    'HideUnifiedProgress',
+    'ShowUnifiedNotification',
+    'HideUnifiedNotification'
 }
 
 server_exports {
     'RegisterInteraction',
     'RemoveInteraction',
     'GetInteraction',
+    'GetAllInteractions',
     'IsPlayerInInteraction',
     'GetPlayerInteraction',
     'CancelPlayerInteraction'

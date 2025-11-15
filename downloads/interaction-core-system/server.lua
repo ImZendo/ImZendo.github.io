@@ -57,6 +57,7 @@ local function InitializeServer()
     serverState.cleanupTimer = GetGameTimer()
     
     print("^2[InteractionCore] Server initialized successfully^0")
+    print("^6[InteractionCore] Server exports now available^0")
     return true
 end
 
@@ -84,7 +85,7 @@ local function CleanupMemory()
         end
     end
     
-    if cleaned > 0 and InteractionCoreConfig and InteractionCoreConfig.debug then
+    if cleaned > 0 and InteractionCoreConfig and InteractionCoreConfig.Debug then
         print(string.format("^3[InteractionCore] Cleaned %d expired entries^0", cleaned))
     end
 end
@@ -119,7 +120,7 @@ RegisterNetEvent('interaction:attempt', function(interactionId, context)
     end
     
     -- Debug logging
-    if InteractionCoreConfig and InteractionCoreConfig.debug then
+    if InteractionCoreConfig and InteractionCoreConfig.Debug then
         print(string.format("^3[InteractionCore] Player %s attempting interaction: %s^0", src, interactionId))
     end
     
@@ -250,6 +251,14 @@ function GetInteraction(interactionId)
     return InteractionCore.Get(interactionId)
 end
 
+-- Get all interactions
+function GetAllInteractions()
+    if not serverState.initialized then
+        return {}
+    end
+    return InteractionCore.GetAll()
+end
+
 -- Check if player is in an interaction
 function IsPlayerInInteraction(playerId)
     if not serverState.initialized then
@@ -295,7 +304,8 @@ end)
 CreateThread(function()
     Wait(1000) -- Wait for everything to load
     if serverState.initialized then
-        print("^2[InteractionCore] Leak-free server ready - " .. (InteractionCore.GetCount or 0) .. " interactions loaded^0")
+        local count = InteractionCore.GetCount and InteractionCore.GetCount() or 0
+        print("^2[InteractionCore] Leak-free server ready - " .. count .. " interactions loaded^0")
     end
 end)
 
@@ -308,16 +318,16 @@ end)
 -- Enable this only if you're not using external lockpick resources
 InteractionCore.Register({
     id = 'example:lockpick:vehicle',
-    type = Config.InteractionTypes.VEHICLE,
+    type = InteractionCoreConfig.Types.VEHICLE,
     range = 2.0,
-    prompt = Config.Prompts.lockpick,
+    prompt = InteractionCoreConfig.Prompts.lockpick,
     validations = {
         {
-            type = Config.ValidationTypes.DISTANCE,
+            type = InteractionCoreConfig.ValidationTypes.DISTANCE,
             range = 2.0
         },
         {
-            type = Config.ValidationTypes.CUSTOM,
+            type = InteractionCoreConfig.ValidationTypes.CUSTOM,
             callback = function(playerId, context, interaction)
                 -- Check if vehicle is locked
                 local vehicle = NetworkGetEntityFromNetworkId(context.targetNetId)

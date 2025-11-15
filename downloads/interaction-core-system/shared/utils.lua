@@ -57,13 +57,33 @@ local function ValidateInteraction(interaction, playerId, context)
         end
     end
     
-    -- Simple custom validation (with timeout protection)
+    -- Enhanced validation system
     if interaction.validations then
         for i = 1, math.min(#interaction.validations, 5) do -- Limit to 5 validations max
             local validation = interaction.validations[i]
-            if validation and validation.callback then
-                local success, result = pcall(validation.callback, playerId, context, interaction)
-                if not success or not result then
+            if validation then
+                local validationResult = false
+                
+                -- Handle different validation types
+                if validation.type == InteractionCoreConfig.ValidationTypes.DISTANCE then
+                    if interaction.coords and context and context.coords then
+                        local distance = InteractionCore.GetDistance(interaction.coords, context.coords)
+                        validationResult = distance <= (validation.range or interaction.range or InteractionCoreConfig.DefaultRange)
+                    end
+                elseif validation.type == InteractionCoreConfig.ValidationTypes.CUSTOM and validation.callback then
+                    local success, result = pcall(validation.callback, playerId, context, interaction)
+                    validationResult = success and result
+                else
+                    -- For other validation types (ITEM, JOB, MONEY), use custom callback if provided
+                    if validation.callback then
+                        local success, result = pcall(validation.callback, playerId, context, interaction)
+                        validationResult = success and result
+                    else
+                        validationResult = true -- Default to true if no callback provided
+                    end
+                end
+                
+                if not validationResult then
                     return false
                 end
             end
@@ -132,6 +152,10 @@ end
 
 function InteractionCore.GetAll()
     return InteractionCore.interactions
+end
+
+function InteractionCore.GetCount()
+    return InteractionCore.interactionCount
 end
 
 function InteractionCore.Validate(interactionId, playerId, context)
@@ -210,6 +234,12 @@ end
 -- Initialize system
 InteractionCore.lastCleanup = GetGameTimer and GetGameTimer() or 0
 
-if InteractionCoreConfig.Debug then
-    print("^2[InteractionCore] Utilities loaded (leak-free version)^0")
+-- Make sure InteractionCore is globally accessible
+_G.InteractionCore = InteractionCore
+rawset(_G, 'InteractionCore', InteractionCore) -- Force global assignment
+
+if InteractionCoreConfig and InteractionCoreConfig.Debug then
+    print("^2[InteractionCore] Utilities loaded (leak-free version) - Global set^0")
+else
+    print("^2[InteractionCore] Utilities loaded - Global set^0")
 end

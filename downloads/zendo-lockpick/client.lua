@@ -12,35 +12,48 @@ local targetVehicle = nil
 -- For showing nice popup messages
 local isShowingPopup = false
 
--- Show a nice popup message to the player
+-- Show a nice popup message to the player (unified system)
 local function ShowPlayerPopup(messageType, title, message, duration)
     duration = duration or (messageType == 'success' and 5000 or 4000)
     
-    SetNuiFocus(false, false) -- Make sure UI doesn't interfere with game
-    SendNUIMessage({
-        action = 'showNotificationPopup',
-        type = messageType,
-        title = title,
-        message = message,
-        duration = duration
-    })
-    
-    isShowingPopup = true
-    
-    -- Hide the popup automatically after some time
-    CreateThread(function()
-        Wait(duration + 500)
-        isShowingPopup = false
-    end)
+    -- Use unified UI system if available
+    if exports['interaction_core'] then
+        local unifiedMessage = title and (title .. ": " .. message) or message
+        exports['interaction_core']:ShowUnifiedNotification(unifiedMessage, messageType, duration)
+    else
+        -- Fallback to original NUI system
+        SetNuiFocus(false, false) -- Make sure UI doesn't interfere with game
+        SendNUIMessage({
+            action = 'showNotificationPopup',
+            type = messageType,
+            title = title,
+            message = message,
+            duration = duration
+        })
+        
+        isShowingPopup = true
+        
+        -- Hide the popup automatically after some time
+        CreateThread(function()
+            Wait(duration + 500)
+            isShowingPopup = false
+        end)
+    end
 end
 
 -- Hide any popup that's currently showing
 local function HidePlayerPopup()
-    if isShowingPopup then
-        SendNUIMessage({
-            action = 'hideNotificationPopup'
-        })
-        isShowingPopup = false
+    -- Use unified UI system if available
+    if exports['interaction_core'] then
+        exports['interaction_core']:HideUnifiedNotification()
+    else
+        -- Fallback to original system
+        if isShowingPopup then
+            SendNUIMessage({
+                action = 'hideNotificationPopup'
+            })
+            isShowingPopup = false
+        end
     end
 end
 

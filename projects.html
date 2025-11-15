@@ -814,6 +814,13 @@ end</code></pre>
                 <h3>Overview</h3>
                 <p>Advanced interaction framework for FiveM servers providing a flexible, extensible system for creating interactive elements. Features multiple interaction types, conditional logic, performance optimization, and a comprehensive API with extensive documentation for developers.</p>
                 
+                <div class="dev-disclaimer-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Development Status:</strong> This project is in active development. New features, improvements, and bug fixes are released regularly. Check back often for the latest version, as updates are deployed at random intervals based on development progress.
+                    </div>
+                </div>
+
                 <div class="features-grid">
                     <div class="feature">
                         <i class="fas fa-mouse-pointer"></i>
@@ -1066,8 +1073,10 @@ end</code></pre>
 
             <div class="download-section">
                 <h3>Available Downloads</h3>
+                <p class="download-description">Get the complete Interaction Core System for free! Includes full source code, documentation, and examples.</p>
+                
                 <div class="download-grid">
-                    <a href="downloads/interaction-core-system.zip" class="download-card" download>
+                    <a href="downloads/interaction-core-system.zip" class="download-card featured-download" download>
                         <div class="download-icon">
                             <i class="fas fa-archive"></i>
                         </div>
@@ -1085,7 +1094,7 @@ end</code></pre>
                             <p>View individual files and folder structure online</p>
                         </div>
                     </a>
-                    <a href="downloads/README-interaction-core.md" class="download-card" download>
+                    <a href="downloads/interaction-core-system/README.md" class="download-card" download>
                         <div class="download-icon">
                             <i class="fas fa-book"></i>
                         </div>
@@ -1114,6 +1123,13 @@ end</code></pre>
                 <h3>Overview</h3>
                 <p>Zendo-Lockpick: Complete lockpicking job system for FiveM servers featuring skill progression, dynamic rewards, database integration, and comprehensive administrative controls. Includes anti-exploit protection and extensive customization options. <strong>Available as a free download with full source code!</strong></p>
                 
+                <div class="dev-disclaimer-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Development Status:</strong> This project is in active development. New features, improvements, and bug fixes are released regularly. Check back often for the latest version, as updates are deployed at random intervals based on development progress.
+                    </div>
+                </div>
+
                 <div class="features-grid">
                     <div class="feature">
                         <i class="fas fa-chart-line"></i>
@@ -1384,6 +1400,211 @@ end, 'admin')</code></pre>
                         <li>✅ Configuration examples and customization guide</li>
                         <li>✅ Admin commands and management tools</li>
                         <li>✅ Framework integration instructions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- World Search System -->
+        <div class="project-detail" id="world-search">
+            <div class="project-header">
+                <h2><i class="fas fa-search-location"></i> World Search System <span class="free-download">FREE DOWNLOAD</span></h2>
+                <div class="project-badges">
+                    <span class="badge lua">Lua</span>
+                    <span class="badge search">Search Engine</span>
+                    <span class="badge ui">UI System</span>
+                    <span class="badge free">Free</span>
+                </div>
+            </div>
+            
+            <div class="project-overview">
+                <h3>Overview</h3>
+                <p>Advanced world search and discovery system for FiveM servers featuring intelligent location finding, category-based organization, distance calculations, and customizable filters. Perfect for large maps with hundreds of points of interest, enabling players to quickly find businesses, landmarks, and interactive locations. <strong>Available as a free download with full source code!</strong></p>
+                
+                <div class="dev-disclaimer-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Development Status:</strong> This project is in active development. New features, improvements, and bug fixes are released regularly. Check back often for the latest version, as updates are deployed at random intervals based on development progress.
+                    </div>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature">
+                        <i class="fas fa-search"></i>
+                        <span>Intelligent search algorithms</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-filter"></i>
+                        <span>Category-based filtering</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Distance calculation & GPS</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-palette"></i>
+                        <span>Customizable UI themes</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-section">
+                <h3>Key Code Snippets</h3>
+                
+                <div class="code-block">
+                    <h4>Search Engine Core</h4>
+                    <pre><code class="language-lua">-- Advanced search system with fuzzy matching
+local WorldSearch = {}
+WorldSearch.locations = {}
+WorldSearch.categories = {}
+WorldSearch.searchIndex = {}
+
+-- Initialize search system with location data
+function WorldSearch:Initialize()
+    -- Load locations from database
+    self:LoadLocations()
+    
+    -- Build search index for performance
+    self:BuildSearchIndex()
+    
+    print('[WORLD-SEARCH] Initialized with ' .. #self.locations .. ' locations')
+end
+
+-- Intelligent location search with fuzzy matching
+function WorldSearch:Search(query, category, maxDistance)
+    local results = {}
+    local playerCoords = GetEntityCoords(PlayerPedId())
+    local lowerQuery = string.lower(query)
+    
+    for _, location in pairs(self.locations) do
+        -- Category filter
+        if category and location.category ~= category then
+            goto continue
+        end
+        
+        -- Distance filter
+        local distance = #(playerCoords - location.coords)
+        if maxDistance and distance > maxDistance then
+            goto continue
+        end
+        
+        -- Fuzzy text matching
+        local nameMatch = self:FuzzyMatch(string.lower(location.name), lowerQuery)
+        local descMatch = location.description and 
+                         self:FuzzyMatch(string.lower(location.description), lowerQuery) or 0
+        
+        local relevanceScore = math.max(nameMatch, descMatch * 0.7)
+        
+        if relevanceScore > 0.3 then -- Minimum relevance threshold
+            table.insert(results, {
+                location = location,
+                distance = distance,
+                relevance = relevanceScore
+            })
+        end
+        
+        ::continue::
+    end
+    
+    -- Sort by relevance, then distance
+    table.sort(results, function(a, b)
+        if math.abs(a.relevance - b.relevance) < 0.1 then
+            return a.distance < b.distance
+        end
+        return a.relevance > b.relevance
+    end)
+    
+    return results
+end</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <h4>GPS and Navigation Integration</h4>
+                    <pre><code class="language-lua">-- Advanced GPS waypoint system
+function WorldSearch:SetWaypoint(locationId)
+    local location = self:GetLocationById(locationId)
+    
+    if not location then
+        return false
+    end
+    
+    local coords = location.coords
+    SetNewWaypoint(coords.x, coords.y)
+    
+    -- Create visual waypoint marker
+    local blip = AddBlipForCoord(coords.x, coords.y, coords.z)
+    SetBlipSprite(blip, 8) -- Waypoint sprite
+    SetBlipColour(blip, 5) -- Yellow
+    SetBlipRoute(blip, true)
+    SetBlipRouteColour(blip, 5)
+    
+    -- Store active waypoint
+    self.activeWaypoint = {
+        location = location,
+        blip = blip,
+        startTime = GetGameTimer()
+    }
+    
+    -- Notify player
+    local playerCoords = GetEntityCoords(PlayerPedId())
+    local distance = #(playerCoords - coords)
+    
+    TriggerEvent('chat:addMessage', {
+        template = 'Waypoint set to ' .. location.name,
+        args = {}
+    })
+    
+    return true
+end</code></pre>
+                </div>
+            </div>
+
+            <div class="technical-details">
+                <h3>Technical Highlights</h3>
+                <ul>
+                    <li><strong>Fuzzy Search Algorithm:</strong> Intelligent text matching for flexible searches</li>
+                    <li><strong>Performance Optimized:</strong> Indexed search with efficient spatial queries</li>
+                    <li><strong>Category System:</strong> Organized location data with customizable categories</li>
+                    <li><strong>GPS Integration:</strong> Full navigation system with distance tracking</li>
+                    <li><strong>Customizable UI:</strong> Modern interface with theming support</li>
+                    <li><strong>Extensible Architecture:</strong> Easy to add new locations and categories</li>
+                </ul>
+            </div>
+
+            <div class="download-section">
+                <h3>Free Download Package</h3>
+                <p class="download-description">Get the complete World Search system absolutely free! Includes full source code, documentation, and setup guide.</p>
+                
+                <div class="download-grid">
+                    <a href="downloads/world-search.zip" class="download-card featured-download" download>
+                        <div class="download-icon">
+                            <i class="fas fa-archive"></i>
+                        </div>
+                        <div class="download-content">
+                            <h4>Complete World Search System</h4>
+                            <p>Full system with all files, UI components, and configurations</p>
+                        </div>
+                    </a>
+                    <a href="downloads/world-search/" class="download-card">
+                        <div class="download-icon">
+                            <i class="fas fa-folder-open"></i>
+                        </div>
+                        <div class="download-content">
+                            <h4>Browse Source Files</h4>
+                            <p>View individual files and folder structure online</p>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="download-features">
+                    <h4>What's Included:</h4>
+                    <ul>
+                        <li>✅ Complete source code for client and server</li>
+                        <li>✅ Modern UI with customizable themes</li>
+                        <li>✅ Sample location database</li>
+                        <li>✅ Category management system</li>
+                        <li>✅ GPS and navigation integration</li>
+                        <li>✅ Installation and configuration guide</li>
                     </ul>
                 </div>
             </div>

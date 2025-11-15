@@ -581,6 +581,78 @@ section {
     50% { transform: scale(1.05); }
 }
 
+/* Development Disclaimer Styles */
+.dev-disclaimer {
+    background: rgba(245, 158, 11, 0.1);
+    border-left: 3px solid #f59e0b;
+    padding: 0.75rem 1rem;
+    margin-top: 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    color: #d97706;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.dev-disclaimer i {
+    color: #f59e0b;
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+}
+
+.dev-disclaimer strong {
+    color: #ea580c;
+}
+
+.dev-disclaimer-box {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.05));
+    border: 2px solid #f59e0b;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    box-shadow: 0 4px 6px rgba(245, 158, 11, 0.1);
+}
+
+.dev-disclaimer-box i {
+    color: #f59e0b;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+}
+
+.dev-disclaimer-box strong {
+    color: #ea580c;
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.dev-disclaimer-box div {
+    flex: 1;
+    color: #92400e;
+    line-height: 1.6;
+}
+
+/* Free Download Badge */
+.free-download {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-left: 1rem;
+    display: inline-block;
+    animation: pulse 2s infinite;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
 /* Interaction Core Highlight Section */
 .interaction-core-highlight {
     background: linear-gradient(135deg, #1f2937 0%, #111827 100%);

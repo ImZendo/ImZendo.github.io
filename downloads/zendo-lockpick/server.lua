@@ -293,19 +293,19 @@ CreateThread(function()
         return
     end
     
-    -- Try to register the actual interaction
+    -- Try to register the actual interaction (using numeric constants since we don't have access to InteractionCoreConfig)
     success = exports['interaction_core']:RegisterInteraction({
         id = "lockpick:vehicle",
-        type = 'vehicle',
+        type = 1, -- VEHICLE type
         range = Config.VehicleSettings.lockpickRange,
         prompt = 'Press ~INPUT_CONTEXT~ to lockpick vehicle',
         validations = {
             {
-                type = 'distance',
+                type = 1, -- DISTANCE validation type
                 range = Config.VehicleSettings.lockpickRange
             },
             {
-                type = 'custom',
+                type = 5, -- CUSTOM validation type
                 callback = function(playerId, context, interaction)
                     local vehicle = NetworkGetEntityFromNetworkId(context.targetNetId)
                     if not DoesEntityExist(vehicle) then return false end
