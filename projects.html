@@ -1609,6 +1609,314 @@ end</code></pre>
                 </div>
             </div>
         </div>
+
+        <!-- Zendo-Transmission System -->
+        <div class="project-detail" id="zendo-transmission">
+            <div class="project-header">
+                <h2><i class="fas fa-cog"></i> Zendo-Transmission System <span class="coming-soon-badge">COMING SOON</span></h2>
+                <div class="project-badges">
+                    <span class="badge lua">Lua</span>
+                    <span class="badge vehicle">Vehicle System</span>
+                    <span class="badge physics">Physics</span>
+                    <span class="badge wip">Work in Progress</span>
+                </div>
+            </div>
+            
+            <div class="project-overview">
+                <h3>Overview</h3>
+                <p>Advanced vehicle transmission system for FiveM servers featuring realistic gear shifting mechanics, manual and automatic transmission modes, clutch system, and performance tuning capabilities. Provides immersive driving experience with customizable shift patterns, engine sounds, and visual indicators. Designed for realistic roleplay servers seeking authentic vehicle behavior.</p>
+                
+                <div class="wip-disclaimer-box">
+                    <i class="fas fa-hammer"></i>
+                    <div>
+                        <strong>Work in Progress:</strong> This project is currently under active development. The system is being built with attention to realism and performance optimization. It will be available for download once core features are complete and thoroughly tested. Check back soon for release updates!
+                    </div>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Manual & Automatic modes</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Realistic RPM simulation</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-compress-arrows-alt"></i>
+                        <span>Clutch mechanics</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-sliders-h"></i>
+                        <span>Performance tuning</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-section">
+                <h3>Preview: Key Code Concepts</h3>
+                <p class="code-preview-note"><em>Note: These are conceptual snippets showing the planned architecture. Final implementation may vary.</em></p>
+                
+                <div class="code-block">
+                    <h4>Transmission Core System</h4>
+                    <pre><code class="language-lua">-- Advanced transmission management system
+local Transmission = {}
+Transmission.vehicles = {}
+Transmission.config = {
+    manualMode = false,
+    clutchEnabled = true,
+    shiftTime = 200, -- ms
+    realisticStalling = true
+}
+
+-- Initialize vehicle transmission
+function Transmission:InitVehicle(vehicle)
+    local vehicleData = {
+        vehicle = vehicle,
+        currentGear = 1,
+        rpm = 0,
+        maxRPM = 8000,
+        mode = 'automatic', -- 'automatic' or 'manual'
+        clutchEngaged = true,
+        engineStalled = false,
+        gearRatios = self:GetGearRatios(vehicle),
+        shiftPoints = self:CalculateShiftPoints(vehicle)
+    }
+    
+    self.vehicles[vehicle] = vehicleData
+    return vehicleData
+end
+
+-- Realistic gear shifting with RPM management
+function Transmission:ShiftGear(vehicle, direction)
+    local vehData = self.vehicles[vehicle]
+    if not vehData then return false end
+    
+    -- Check if shifting is allowed
+    if not vehData.clutchEngaged and self.config.clutchEnabled then
+        TriggerEvent('transmission:notify', 'Engage clutch to shift!', 'error')
+        return false
+    end
+    
+    local newGear = vehData.currentGear + direction
+    local maxGear = #vehData.gearRatios
+    
+    -- Validate gear range
+    if newGear < 1 or newGear > maxGear then
+        return false
+    end
+    
+    -- Perform shift
+    vehData.currentGear = newGear
+    
+    -- Calculate RPM change based on gear ratio
+    local oldRatio = vehData.gearRatios[vehData.currentGear - direction]
+    local newRatio = vehData.gearRatios[newGear]
+    vehData.rpm = vehData.rpm * (oldRatio / newRatio)
+    
+    -- Visual and audio feedback
+    self:PlayShiftAnimation(vehicle)
+    self:PlayShiftSound(vehicle, direction)
+    
+    return true
+end
+
+-- Calculate optimal shift points based on vehicle stats
+function Transmission:CalculateShiftPoints(vehicle)
+    local maxSpeed = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveMaxFlatVel')
+    local acceleration = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fInitialDriveForce')
+    
+    local shiftPoints = {}
+    local baseShiftRPM = 6500
+    
+    -- Adjust for vehicle performance
+    local performanceFactor = (acceleration / 1.0) * (maxSpeed / 150.0)
+    
+    for gear = 1, 6 do
+        shiftPoints[gear] = {
+            upshift = baseShiftRPM * (1 - (gear * 0.05)),
+            downshift = baseShiftRPM * 0.4
+        }
+    end
+    
+    return shiftPoints
+end</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <h4>Clutch and Engine Stall System</h4>
+                    <pre><code class="language-lua">-- Realistic clutch mechanics with stalling
+function Transmission:UpdateClutch(vehicle, clutchInput)
+    local vehData = self.vehicles[vehicle]
+    if not vehData or not self.config.clutchEnabled then return end
+    
+    -- Clutch is analog (0.0 to 1.0)
+    local previousState = vehData.clutchEngaged
+    vehData.clutchEngaged = clutchInput < 0.5
+    
+    -- Check for stall conditions
+    if self.config.realisticStalling then
+        local speed = GetEntitySpeed(vehicle) * 3.6 -- Convert to km/h
+        
+        -- Stall if releasing clutch too fast in low gear at low speed
+        if not previousState and vehData.clutchEngaged then
+            if vehData.currentGear <= 2 and speed < 5 and vehData.rpm < 1500 then
+                self:StallEngine(vehicle)
+                return
+            end
+        end
+    end
+    
+    -- Update power delivery based on clutch engagement
+    local powerMultiplier = vehData.clutchEngaged and 1.0 or clutchInput
+    SetVehicleEnginePowerMultiplier(vehicle, powerMultiplier)
+end
+
+-- Engine stall handling
+function Transmission:StallEngine(vehicle)
+    local vehData = self.vehicles[vehicle]
+    if not vehData then return end
+    
+    vehData.engineStalled = true
+    vehData.rpm = 0
+    
+    SetVehicleEngineOn(vehicle, false, true, false)
+    
+    -- Visual feedback
+    TriggerEvent('transmission:notify', 'Engine Stalled! Press [IGNITION] to restart', 'warning')
+    
+    -- Play stall sound
+    PlaySoundFromEntity(-1, 'Engine_fail', vehicle, 'DLC_PILOT_ENGINE_FAILURE_SOUNDS', true, 0)
+end
+
+-- Restart stalled engine
+function Transmission:RestartEngine(vehicle)
+    local vehData = self.vehicles[vehicle]
+    if not vehData or not vehData.engineStalled then return end
+    
+    -- Check if conditions are right for restart
+    if vehData.clutchEngaged or vehData.currentGear == 0 then
+        SetVehicleEngineOn(vehicle, true, false, true)
+        vehData.engineStalled = false
+        vehData.rpm = 1000 -- Idle RPM
+        
+        TriggerEvent('transmission:notify', 'Engine started', 'success')
+    else
+        TriggerEvent('transmission:notify', 'Engage clutch or put in neutral first', 'error')
+    end
+end</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <h4>Automatic vs Manual Mode</h4>
+                    <pre><code class="language-lua">-- Intelligent automatic transmission logic
+function Transmission:UpdateAutomatic(vehicle, deltaTime)
+    local vehData = self.vehicles[vehicle]
+    if not vehData or vehData.mode ~= 'automatic' then return end
+    
+    local throttle = GetVehicleThrottleOffset(vehicle)
+    local brake = GetVehicleHandbrake(vehicle)
+    local currentGear = vehData.currentGear
+    local shiftPoint = vehData.shiftPoints[currentGear]
+    
+    -- Upshift logic
+    if vehData.rpm > shiftPoint.upshift and throttle > 0.3 then
+        if currentGear < #vehData.gearRatios then
+            -- Smooth automatic shift
+            self:AutoShift(vehicle, 1)
+        end
+    end
+    
+    -- Downshift logic
+    if vehData.rpm < shiftPoint.downshift and currentGear > 1 then
+        -- Only downshift if throttle is applied or braking
+        if throttle > 0.1 or brake then
+            self:AutoShift(vehicle, -1)
+        end
+    end
+    
+    -- Kickdown detection (for quick acceleration)
+    if throttle > 0.9 and vehData.rpm < shiftPoint.upshift * 0.7 then
+        if currentGear > 2 then
+            self:AutoShift(vehicle, -1) -- Downshift for more power
+            TriggerEvent('transmission:notify', 'Kickdown activated', 'info')
+        end
+    end
+end
+
+-- Smooth automatic shifting with delay
+function Transmission:AutoShift(vehicle, direction)
+    local vehData = self.vehicles[vehicle]
+    
+    -- Reduce power during shift
+    SetVehicleEnginePowerMultiplier(vehicle, 0.3)
+    
+    Citizen.SetTimeout(self.config.shiftTime, function()
+        self:ShiftGear(vehicle, direction)
+        
+        -- Restore power after shift
+        Citizen.SetTimeout(100, function()
+            SetVehicleEnginePowerMultiplier(vehicle, 1.0)
+        end)
+    end)
+end
+
+-- Toggle between automatic and manual
+function Transmission:ToggleMode(vehicle)
+    local vehData = self.vehicles[vehicle]
+    if not vehData then return end
+    
+    if vehData.mode == 'automatic' then
+        vehData.mode = 'manual'
+        TriggerEvent('transmission:notify', 'Manual mode activated', 'success')
+    else
+        vehData.mode = 'automatic'
+        TriggerEvent('transmission:notify', 'Automatic mode activated', 'success')
+    end
+    
+    -- Update UI
+    SendNUIMessage({
+        type = 'updateMode',
+        mode = vehData.mode
+    })
+end</code></pre>
+                </div>
+            </div>
+
+            <div class="technical-details">
+                <h3>Planned Features</h3>
+                <ul>
+                    <li><strong>Dual Transmission Modes:</strong> Seamless switching between automatic and manual</li>
+                    <li><strong>Realistic Physics:</strong> Accurate gear ratios and RPM calculations</li>
+                    <li><strong>Clutch System:</strong> Analog clutch control with stalling mechanics</li>
+                    <li><strong>Performance Tuning:</strong> Customizable shift points and gear ratios</li>
+                    <li><strong>Visual Indicators:</strong> Modern UI showing gear, RPM, and mode</li>
+                    <li><strong>Engine Sounds:</strong> Dynamic audio feedback for shifts and stalls</li>
+                    <li><strong>Anti-Stall Assist:</strong> Optional helper for beginners</li>
+                    <li><strong>Sequential Shifting:</strong> Support for paddle shifters and sequential gearboxes</li>
+                </ul>
+            </div>
+
+            <div class="coming-soon-section">
+                <h3><i class="fas fa-clock"></i> Coming Soon</h3>
+                <p class="coming-soon-text">This project is currently in active development. We're working hard to deliver a realistic and immersive transmission system that will enhance your driving experience. The system will be released once it meets our quality standards and includes comprehensive documentation.</p>
+                
+                <div class="development-status">
+                    <h4>Current Development Status:</h4>
+                    <ul>
+                        <li>✅ Core transmission logic architecture designed</li>
+                        <li>🔄 Gear shifting mechanics in development</li>
+                        <li>🔄 Clutch system implementation in progress</li>
+                        <li>⏳ UI/HUD system planned</li>
+                        <li>⏳ Sound integration pending</li>
+                        <li>⏳ Performance optimization phase upcoming</li>
+                        <li>⏳ Documentation and examples to be written</li>
+                    </ul>
+                </div>
+                
+                <p class="stay-tuned"><strong>Stay tuned!</strong> Follow this portfolio for updates on the release. Once available, full source code and installation instructions will be provided for free download.</p>
+            </div>
+        </div>
     </div>
 
     <!-- Back to Portfolio -->
